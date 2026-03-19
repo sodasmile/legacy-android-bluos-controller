@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#000000"
+    android:padding="8dp">
+
+    <!-- ── Now Playing ─────────────────────────────────────────────────── -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2.5"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="8dp">
+
+        <!-- Small state label (Playing / Paused / Cannot reach player …) -->
+        <TextView
+            android:id="@+id/txt_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Connecting..."
+            android:textColor="#888888"
+            android:textSize="12sp"
+            android:gravity="center" />
+
+        <!-- Track title -->
+        <TextView
+            android:id="@+id/txt_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            android:maxLines="2"
+            android:ellipsize="end" />
+
+        <!-- Artist -->
+        <TextView
+            android:id="@+id/txt_artist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#CCCCCC"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_marginTop="6dp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <!-- Album -->
+        <TextView
+            android:id="@+id/txt_album"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#777777"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:layout_marginTop="3dp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+    </LinearLayout>
+
+    <!-- ── Transport ───────────────────────────────────────────────────── -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.2"
+        android:orientation="horizontal"
+        android:layout_marginBottom="6dp">
+
+        <Button
+            android:id="@+id/btn_prev"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="|&lt;"
+            android:textSize="26sp"
+            android:textColor="#FFFFFF"
+            android:background="#222222"
+            android:layout_marginRight="4dp" />
+
+        <Button
+            android:id="@+id/btn_play_pause"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:text="&gt;"
+            android:textSize="32sp"
+            android:textColor="#FFFFFF"
+            android:background="#1A73E8"
+            android:layout_marginRight="4dp" />
+
+        <Button
+            android:id="@+id/btn_next"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="&gt;|"
+            android:textSize="26sp"
+            android:textColor="#FFFFFF"
+            android:background="#222222" />
+
+    </LinearLayout>
+
+    <!-- ── Volume ──────────────────────────────────────────────────────── -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.9"
+        android:orientation="horizontal"
+        android:layout_marginBottom="6dp">
+
+        <Button
+            android:id="@+id/btn_vol_down"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="VOL -"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:background="#333333"
+            android:layout_marginRight="4dp" />
+
+        <!-- Volume level display -->
+        <TextView
+            android:id="@+id/txt_volume"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.7"
+            android:text="--"
+            android:textColor="#FFFFFF"
+            android:textSize="28sp"
+            android:gravity="center"
+            android:background="#111111"
+            android:layout_marginRight="4dp" />
+
+        <Button
+            android:id="@+id/btn_vol_up"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="VOL +"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:background="#333333" />
+
+    </LinearLayout>
+
+    <!-- ── Settings ────────────────────────────────────────────────────── -->
+    <Button
+        android:id="@+id/btn_settings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SETTINGS"
+        android:textSize="13sp"
+        android:textColor="#666666"
+        android:background="#0D0D0D" />
+
+</LinearLayout>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Theme.Black.NoTitleBar.Fullscreen is available from API 1.
+        It hides the title bar and status bar without needing any support library.
+        FLAG_KEEP_SCREEN_ON and wake/lock-screen flags are applied programmatically
+        in each Activity so they apply regardless of how the activity is started.
+    -->
+    <style name="AppTheme" parent="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+    </style>
+</resources>
