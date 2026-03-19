@@ -1,6 +1,8 @@
 package com.bluesound.legacy;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -10,9 +12,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.List;
+
 /**
- * Simple settings screen for configuring the BluOS player's IP address and port.
- * Values are persisted in SharedPreferences and read by MainActivity on every onResume.
+ * Settings screen: configure BluOS player IP and port.
+ * Also allows auto-discovery via mDNS (_musc._tcp.local) so the user
+ * never has to type an IP address manually.
  */
 public class SettingsActivity extends Activity {
 
@@ -42,6 +47,10 @@ public class SettingsActivity extends Activity {
         editHost.setText(savedHost);
         editPort.setText(String.valueOf(savedPort));
 
+        ((Button) findViewById(R.id.btn_discover)).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) { startDiscovery(); }
+        });
+
         ((Button) findViewById(R.id.btn_save)).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) { saveSettings(); }
         });
@@ -50,6 +59,52 @@ public class SettingsActivity extends Activity {
             @Override public void onClick(View v) { finish(); }
         });
     }
+
+    // -------------------------------------------------------------------------
+    // mDNS discovery
+    // -------------------------------------------------------------------------
+
+    private void startDiscovery() {
+        final Button btn = (Button) findViewById(R.id.btn_discover);
+        btn.setEnabled(false);
+        btn.setText("SEARCHING...");
+
+        new MdnsDiscovery(this, new MdnsDiscovery.Listener() {
+            @Override
+            public void onDiscoveryComplete(final List<MdnsDiscovery.Player> players) {
+                btn.setEnabled(true);
+                btn.setText("DISCOVER PLAYERS");
+
+                if (players.isEmpty()) {
+                    Toast.makeText(SettingsActivity.this,
+                            "No players found on network", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                // Build name list for the selection dialog
+                final String[] names = new String[players.size()];
+                for (int i = 0; i < players.size(); i++) {
+                    names[i] = players.get(i).toString();
+                }
+
+                new AlertDialog.Builder(SettingsActivity.this)
+                        .setTitle("Select Player")
+                        .setItems(names, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                MdnsDiscovery.Player p = players.get(which);
+                                editHost.setText(p.host);
+                                editPort.setText(String.valueOf(p.port));
+                            }
+                        })
+                        .show();
+            }
+        }).discover();
+    }
+
+    // -------------------------------------------------------------------------
+    // Save
+    // -------------------------------------------------------------------------
 
     private void saveSettings() {
         String host    = editHost.getText().toString().trim();

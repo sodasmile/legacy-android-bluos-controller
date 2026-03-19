@@ -118,7 +118,7 @@ public class MainActivity extends Activity {
 
         if (host == null || host.length() == 0) {
             client = null;
-            txtStatus.setText("No player configured — tap SETTINGS");
+            txtStatus.setText("No player configured — tap \u2699 to set up");
             txtTitle.setText("");
             txtArtist.setText("");
             txtAlbum.setText("");
@@ -143,13 +143,13 @@ public class MainActivity extends Activity {
 
         findViewById(R.id.btn_vol_down).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
-                setVolume(Math.max(0, currentVolume - 5));
+                setVolume(Math.max(0, currentVolume - 1));
             }
         });
 
         findViewById(R.id.btn_vol_up).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
-                setVolume(Math.min(100, currentVolume + 5));
+                setVolume(Math.min(100, currentVolume + 1));
             }
         });
 

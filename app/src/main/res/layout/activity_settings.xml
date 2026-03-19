@@ -36,6 +36,18 @@
         android:background="#1C1C1C"
         android:padding="14dp"
         android:textSize="20sp"
+        android:layout_marginBottom="10dp" />
+
+    <!-- Auto-discover players on the local network via mDNS -->
+    <Button
+        android:id="@+id/btn_discover"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="DISCOVER PLAYERS"
+        android:textSize="14sp"
+        android:textColor="#FFFFFF"
+        android:background="#1E5C1E"
+        android:padding="12dp"
         android:layout_marginBottom="20dp" />
 
     <TextView

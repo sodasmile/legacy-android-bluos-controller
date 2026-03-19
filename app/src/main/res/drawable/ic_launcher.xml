@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Retro BluOS icon: phosphor-green concentric rings on a near-black background,
+    evoking an old monochrome CRT or oscilloscope display.
+    The three rings loosely echo the Bluesound sound-wave motif in aged form.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Near-black background, very slightly green-tinted like an old CRT -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#060D06" />
+        </shape>
+    </item>
+
+    <!-- Outer ring: dim, like a faded phosphor afterglow -->
+    <item
+        android:top="2dp"
+        android:bottom="2dp"
+        android:left="2dp"
+        android:right="2dp">
+        <shape
+            android:shape="ring"
+            android:innerRadiusRatio="2.8"
+            android:thicknessRatio="14"
+            android:useLevel="false">
+            <solid android:color="#0F4A0F" />
+        </shape>
+    </item>
+
+    <!-- Middle ring: brighter, the main phosphor glow -->
+    <item
+        android:top="10dp"
+        android:bottom="10dp"
+        android:left="10dp"
+        android:right="10dp">
+        <shape
+            android:shape="ring"
+            android:innerRadiusRatio="2.6"
+            android:thicknessRatio="10"
+            android:useLevel="false">
+            <solid android:color="#1A7A1A" />
+        </shape>
+    </item>
+
+    <!-- Inner ring: brightest, the active center -->
+    <item
+        android:top="18dp"
+        android:bottom="18dp"
+        android:left="18dp"
+        android:right="18dp">
+        <shape
+            android:shape="ring"
+            android:innerRadiusRatio="2.4"
+            android:thicknessRatio="8"
+            android:useLevel="false">
+            <solid android:color="#2AA82A" />
+        </shape>
+    </item>
+
+    <!-- Center dot: the brightest point, like the electron beam origin -->
+    <item
+        android:top="26dp"
+        android:bottom="26dp"
+        android:left="26dp"
+        android:right="26dp">
+        <shape android:shape="oval">
+            <solid android:color="#3DCC3D" />
+        </shape>
+    </item>
+
+</layer-list>
