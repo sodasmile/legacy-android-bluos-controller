@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 
 /**
  * Minimal BluOS HTTP API client.
@@ -49,6 +50,14 @@ public class BluOSClient {
     public void setVolume(int level) throws IOException {
         int clamped = Math.max(0, Math.min(100, level));
         doGet("/Volume?level=" + clamped);
+    }
+
+    public void playUrl(String url) throws IOException {
+        try {
+            doGet("/Play?url=" + URLEncoder.encode(url, "UTF-8"));
+        } catch (java.io.UnsupportedEncodingException e) {
+            // UTF-8 is always supported
+        }
     }
 
     // -------------------------------------------------------------------------

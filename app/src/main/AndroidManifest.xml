@@ -41,6 +41,10 @@
             android:name=".SettingsActivity"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".PresetActivity"
+            android:screenOrientation="portrait" />
+
         <!-- Starts the app automatically on device boot -->
         <receiver
             android:name=".BootReceiver"

@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -158,6 +160,36 @@ public class MainActivity extends Activity {
                 startActivity(new Intent(MainActivity.this, SettingsActivity.class));
             }
         });
+
+        // Swipe right on the now-playing area → open station list
+        final GestureDetector swipe = new GestureDetector(
+                new GestureDetector.SimpleOnGestureListener() {
+                    private static final int MIN_DISTANCE = 80;
+                    private static final int MIN_VELOCITY = 80;
+
+                    @Override
+                    public boolean onFling(MotionEvent e1, MotionEvent e2,
+                                          float vX, float vY) {
+                        float dX = e2.getX() - e1.getX();
+                        float dY = e2.getY() - e1.getY();
+                        if (Math.abs(dX) > Math.abs(dY)
+                                && dX > MIN_DISTANCE
+                                && Math.abs(vX) > MIN_VELOCITY) {
+                            startActivity(new Intent(MainActivity.this,
+                                    PresetActivity.class));
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+
+        findViewById(R.id.layout_now_playing).setOnTouchListener(
+                new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        return swipe.onTouchEvent(event);
+                    }
+                });
     }
 
     // -------------------------------------------------------------------------
