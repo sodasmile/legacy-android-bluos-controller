@@ -168,6 +168,11 @@ public class MainActivity extends Activity {
                     private static final int MIN_VELOCITY = 80;
 
                     @Override
+                    public boolean onDown(MotionEvent e) {
+                        return true; // must return true or fling events are never delivered
+                    }
+
+                    @Override
                     public boolean onFling(MotionEvent e1, MotionEvent e2,
                                           float vX, float vY) {
                         float dX = e2.getX() - e1.getX();
