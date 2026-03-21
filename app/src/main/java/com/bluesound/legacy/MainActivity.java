@@ -162,7 +162,7 @@ public class MainActivity extends Activity {
         });
 
         // Swipe right on the now-playing area → open station list
-        final GestureDetector swipe = new GestureDetector(
+        final GestureDetector swipe = new GestureDetector(this,
                 new GestureDetector.SimpleOnGestureListener() {
                     private static final int MIN_DISTANCE = 80;
                     private static final int MIN_VELOCITY = 80;
@@ -178,10 +178,17 @@ public class MainActivity extends Activity {
                         float dX = e2.getX() - e1.getX();
                         float dY = e2.getY() - e1.getY();
                         if (Math.abs(dX) > Math.abs(dY)
-                                && dX > MIN_DISTANCE
+                                && Math.abs(dX) > MIN_DISTANCE
                                 && Math.abs(vX) > MIN_VELOCITY) {
-                            startActivity(new Intent(MainActivity.this,
-                                    PresetActivity.class));
+                            if (dX < 0) {
+                                // Left swipe → radio presets
+                                startActivity(new Intent(MainActivity.this,
+                                        PresetActivity.class));
+                            } else {
+                                // Right swipe → Tidal albums
+                                startActivity(new Intent(MainActivity.this,
+                                        AlbumActivity.class));
+                            }
                             return true;
                         }
                         return false;

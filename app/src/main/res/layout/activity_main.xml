@@ -20,7 +20,7 @@
             android:text="SET"
             android:textSize="12sp"
             android:textColor="#555555"
-            android:background="#00000000"
+            android:background="@null"
             android:padding="8dp" />
 
     </LinearLayout>
@@ -33,6 +33,7 @@
         android:layout_weight="2.5"
         android:orientation="vertical"
         android:gravity="center"
+        android:clickable="true"
         android:padding="8dp">
 
         <!-- Small state label (Playing / Paused / Cannot reach player …) -->

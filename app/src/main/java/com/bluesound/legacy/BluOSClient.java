@@ -52,6 +52,10 @@ public class BluOSClient {
         doGet("/Volume?level=" + clamped);
     }
 
+    public void playAlbum(String service, String albumId) throws IOException {
+        doGet("/Add?playnow=1&service=" + service + "&albumid=" + albumId);
+    }
+
     public void playUrl(String url) throws IOException {
         try {
             doGet("/Play?url=" + URLEncoder.encode(url, "UTF-8"));
