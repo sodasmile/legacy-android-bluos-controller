@@ -127,9 +127,6 @@ public class MainActivity extends Activity {
             txtVolume.setText("--");
         } else {
             client = new BluOSClient(host, port);
-            // Pre-warm the RC: playlist cache in the background so the swipe
-            // panel opens instantly. No-op if already loaded for this host/port.
-            PlaylistCache.preload(client, host, port);
         }
     }
 

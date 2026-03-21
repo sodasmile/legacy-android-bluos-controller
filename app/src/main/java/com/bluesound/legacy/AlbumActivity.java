@@ -16,29 +16,27 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
  * Full-screen list of RC:-prefixed Tidal playlists, reached by swiping
  * right on the now-playing area.
  *
- * The playlist data is pre-loaded in the background by MainActivity as soon
- * as the app starts, so this screen almost always opens instantly.  If it
- * hasn't arrived yet (e.g. the panel was opened very quickly after launch)
- * a "Loading…" message is shown and the list appears as soon as the data is
- * ready, with no user action required.
+ * Fetches fresh from the player every time the panel opens — fast enough
+ * on local WiFi that a brief "Loading…" is all the user sees.
  *
- * Each row shows the album artwork on the left and the playlist name on the
- * right. Images are loaded asynchronously via ImageCache (3-thread pool,
- * downsampled 4x on decode) and cached for the session.
+ * Results are sorted alphabetically by display name (prefix stripped),
+ * so playlist order is controlled entirely by naming in Tidal.
  */
 public class AlbumActivity extends Activity {
 
-    private BluOSClient       client;
-    private final Handler     handler   = new Handler();
-    private List<RcPlaylist>  playlists = new ArrayList<RcPlaylist>();
-    private PlaylistAdapter   adapter;
-    private TextView          txtEmpty;
+    private BluOSClient      client;
+    private final Handler    handler   = new Handler();
+    private List<RcPlaylist> playlists = new ArrayList<RcPlaylist>();
+    private PlaylistAdapter  adapter;
+    private TextView         txtEmpty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,37 +70,49 @@ public class AlbumActivity extends Activity {
             }
         });
 
-        showFromCache();
+        fetchPlaylists();
     }
 
     // -------------------------------------------------------------------------
-    // Cache polling
+    // Fetch + sort
     // -------------------------------------------------------------------------
 
-    private void showFromCache() {
-        List<RcPlaylist> cached = PlaylistCache.get();
-        if (cached != null) {
-            applyData(cached);
-        } else if (PlaylistCache.isLoading()) {
-            txtEmpty.setText("Loading\u2026");
-            txtEmpty.setVisibility(View.VISIBLE);
-            pollForCache();
-        } else {
+    private void fetchPlaylists() {
+        if (client == null) {
             txtEmpty.setText("No player configured");
             txtEmpty.setVisibility(View.VISIBLE);
+            return;
         }
-    }
 
-    /** Poll every 300 ms until PlaylistCache has data, then display it. */
-    private void pollForCache() {
-        List<RcPlaylist> cached = PlaylistCache.get();
-        if (cached != null) {
-            applyData(cached);
-        } else {
-            handler.postDelayed(new Runnable() {
-                public void run() { pollForCache(); }
-            }, 300);
-        }
+        txtEmpty.setText("Loading\u2026");
+        txtEmpty.setVisibility(View.VISIBLE);
+
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    final List<RcPlaylist> result = client.fetchRcPlaylists();
+
+                    // Sort by display name so the order in Tidal controls the
+                    // order here — prefix trick: "RC: A..." sorts before "RC: B..."
+                    Collections.sort(result, new Comparator<RcPlaylist>() {
+                        public int compare(RcPlaylist a, RcPlaylist b) {
+                            return a.name.compareToIgnoreCase(b.name);
+                        }
+                    });
+
+                    handler.post(new Runnable() {
+                        public void run() { applyData(result); }
+                    });
+                } catch (final Exception e) {
+                    handler.post(new Runnable() {
+                        public void run() {
+                            txtEmpty.setText("Could not reach player");
+                            txtEmpty.setVisibility(View.VISIBLE);
+                        }
+                    });
+                }
+            }
+        }).start();
     }
 
     private void applyData(List<RcPlaylist> data) {
@@ -152,9 +162,9 @@ public class AlbumActivity extends Activity {
 
     private class PlaylistAdapter extends BaseAdapter {
 
-        public int    getCount()           { return playlists.size(); }
-        public Object getItem(int pos)     { return playlists.get(pos); }
-        public long   getItemId(int pos)   { return pos; }
+        public int    getCount()         { return playlists.size(); }
+        public Object getItem(int pos)   { return playlists.get(pos); }
+        public long   getItemId(int pos) { return pos; }
 
         public View getView(int pos, View convertView, ViewGroup parent) {
             if (convertView == null) {
