@@ -10,20 +10,35 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Full-screen vertically-scrolling list of Tidal albums.
- * Reached by swiping right on the now-playing area in MainActivity.
- * Tapping an album tells the BluOS player to start playing it via
- * /Add?playnow=1&service=Tidal&albumid=... then returns to the main screen.
+ * Full-screen list of RC:-prefixed Tidal playlists, reached by swiping
+ * right on the now-playing area.
+ *
+ * The playlist data is pre-loaded in the background by MainActivity as soon
+ * as the app starts, so this screen almost always opens instantly.  If it
+ * hasn't arrived yet (e.g. the panel was opened very quickly after launch)
+ * a "Loading…" message is shown and the list appears as soon as the data is
+ * ready, with no user action required.
+ *
+ * Each row shows the album artwork on the left and the playlist name on the
+ * right. Images are loaded asynchronously via ImageCache (3-thread pool,
+ * downsampled 4x on decode) and cached for the session.
  */
 public class AlbumActivity extends Activity {
 
-    private BluOSClient client;
-    private final Handler handler = new Handler();
+    private BluOSClient       client;
+    private final Handler     handler   = new Handler();
+    private List<RcPlaylist>  playlists = new ArrayList<RcPlaylist>();
+    private PlaylistAdapter   adapter;
+    private TextView          txtEmpty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,60 +60,113 @@ public class AlbumActivity extends Activity {
             client = new BluOSClient(host, port);
         }
 
+        txtEmpty = (TextView) findViewById(R.id.txt_empty);
         ListView list = (ListView) findViewById(R.id.list_albums);
-        list.setAdapter(new AlbumAdapter());
+        adapter = new PlaylistAdapter();
+        list.setAdapter(adapter);
 
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                playAlbum(Album.ALL[position]);
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                play(playlists.get(position));
             }
         });
+
+        showFromCache();
     }
 
-    private void playAlbum(final Album album) {
+    // -------------------------------------------------------------------------
+    // Cache polling
+    // -------------------------------------------------------------------------
+
+    private void showFromCache() {
+        List<RcPlaylist> cached = PlaylistCache.get();
+        if (cached != null) {
+            applyData(cached);
+        } else if (PlaylistCache.isLoading()) {
+            txtEmpty.setText("Loading\u2026");
+            txtEmpty.setVisibility(View.VISIBLE);
+            pollForCache();
+        } else {
+            txtEmpty.setText("No player configured");
+            txtEmpty.setVisibility(View.VISIBLE);
+        }
+    }
+
+    /** Poll every 300 ms until PlaylistCache has data, then display it. */
+    private void pollForCache() {
+        List<RcPlaylist> cached = PlaylistCache.get();
+        if (cached != null) {
+            applyData(cached);
+        } else {
+            handler.postDelayed(new Runnable() {
+                public void run() { pollForCache(); }
+            }, 300);
+        }
+    }
+
+    private void applyData(List<RcPlaylist> data) {
+        playlists = data;
+        adapter.notifyDataSetChanged();
+        if (playlists.isEmpty()) {
+            txtEmpty.setText("No RC: playlists found");
+            txtEmpty.setVisibility(View.VISIBLE);
+        } else {
+            txtEmpty.setVisibility(View.GONE);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Playback
+    // -------------------------------------------------------------------------
+
+    private void play(final RcPlaylist playlist) {
         if (client == null) {
             Toast.makeText(this, "No player configured", Toast.LENGTH_SHORT).show();
             return;
         }
-
         new Thread(new Runnable() {
-            @Override
             public void run() {
                 try {
-                    client.playAlbum(album.service, album.albumId);
+                    client.loadPlaylist(playlist.playUrl);
                 } catch (final Exception e) {
                     handler.post(new Runnable() {
-                        @Override public void run() {
+                        public void run() {
                             Toast.makeText(AlbumActivity.this,
-                                    "Could not reach player", Toast.LENGTH_SHORT).show();
+                                    "Could not reach player",
+                                    Toast.LENGTH_SHORT).show();
                         }
                     });
                     return;
                 }
                 handler.post(new Runnable() {
-                    @Override public void run() { finish(); }
+                    public void run() { finish(); }
                 });
             }
         }).start();
     }
 
-    // Two-line list adapter: bold title + dim artist
-    private class AlbumAdapter extends BaseAdapter {
+    // -------------------------------------------------------------------------
+    // List adapter
+    // -------------------------------------------------------------------------
 
-        @Override public int getCount()                             { return Album.ALL.length; }
-        @Override public Object getItem(int position)              { return Album.ALL[position]; }
-        @Override public long getItemId(int position)              { return position; }
+    private class PlaylistAdapter extends BaseAdapter {
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public int    getCount()           { return playlists.size(); }
+        public Object getItem(int pos)     { return playlists.get(pos); }
+        public long   getItemId(int pos)   { return pos; }
+
+        public View getView(int pos, View convertView, ViewGroup parent) {
             if (convertView == null) {
                 convertView = getLayoutInflater()
                         .inflate(R.layout.item_album, parent, false);
             }
-            Album a = Album.ALL[position];
-            ((TextView) convertView.findViewById(R.id.txt_album_title)).setText(a.title);
-            ((TextView) convertView.findViewById(R.id.txt_album_artist)).setText(a.artist);
+            RcPlaylist p = playlists.get(pos);
+            ((TextView)  convertView.findViewById(R.id.txt_album_title))
+                    .setText(p.name);
+            ImageCache.load(p.imageUrl,
+                    (ImageView) convertView.findViewById(R.id.img_album_art),
+                    handler);
             return convertView;
         }
     }

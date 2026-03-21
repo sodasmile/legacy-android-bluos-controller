@@ -12,6 +12,8 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Minimal BluOS HTTP API client.
@@ -54,6 +56,73 @@ public class BluOSClient {
 
     public void playAlbum(String service, String albumId) throws IOException {
         doGet("/Add?playnow=1&service=" + service + "&albumid=" + albumId);
+    }
+
+    /** Load a playlist using the play URL path returned by the Browse API. */
+    public void loadPlaylist(String playUrl) throws IOException {
+        doGet(playUrl);
+    }
+
+    /**
+     * Fetch all Tidal playlists whose name starts with "RC: " by paginating
+     * through /Browse My Playlists. The prefix is stripped in the returned
+     * RcPlaylist objects. Image URLs are resolved to full http://host:port/...
+     * so callers don't need to know the player address.
+     */
+    public List<RcPlaylist> fetchRcPlaylists()
+            throws IOException, XmlPullParserException {
+        List<RcPlaylist> result = new ArrayList<RcPlaylist>();
+        // First page key — note: inner path is already %-encoded, the & between
+        // outer query params must be encoded as %26 (handled in the loop below).
+        String key = "Tidal:Playlist/%2FPlaylists%3Fservice%3DTidal";
+        int maxPages = 20; // safety cap — 20 pages × 30 items = 600 playlists max
+        while (key != null && maxPages-- > 0) {
+            // The nextKey value (from XML) uses & as separator; these must be
+            // encoded as %26 so they aren't mistaken for additional URL params.
+            String xml = doGet("/Browse?key=" + key.replace("&", "%26"));
+            if (xml == null) break;
+            key = parseRcPage(xml, result);
+        }
+        return result;
+    }
+
+    /**
+     * Parse one page of /Browse playlist results.
+     * Appends matching RC: items to {@code out}.
+     * Returns the nextKey attribute value (for the next page), or null if done.
+     */
+    private String parseRcPage(String xml, List<RcPlaylist> out)
+            throws IOException, XmlPullParserException {
+        String nextKey = null;
+        XmlPullParser p = Xml.newPullParser();
+        p.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+        p.setInput(new StringReader(xml));
+
+        int event = p.getEventType();
+        while (event != XmlPullParser.END_DOCUMENT) {
+            if (event == XmlPullParser.START_TAG) {
+                String tag = p.getName();
+                if ("browse".equals(tag)) {
+                    nextKey = p.getAttributeValue(null, "nextKey");
+                } else if ("item".equals(tag)) {
+                    String text = p.getAttributeValue(null, "text");
+                    if (text != null && text.startsWith(RcPlaylist.PREFIX)) {
+                        String displayName = text.substring(RcPlaylist.PREFIX.length());
+                        String playUrl    = p.getAttributeValue(null, "playURL");
+                        String imageRel   = p.getAttributeValue(null, "image");
+                        // Resolve relative image path to a full URL
+                        String imageUrl   = (imageRel != null && imageRel.length() > 0)
+                                ? "http://" + host + ":" + port + imageRel
+                                : null;
+                        if (playUrl != null && playUrl.length() > 0) {
+                            out.add(new RcPlaylist(displayName, playUrl, imageUrl));
+                        }
+                    }
+                }
+            }
+            event = p.next();
+        }
+        return nextKey;
     }
 
     public void playUrl(String url) throws IOException {

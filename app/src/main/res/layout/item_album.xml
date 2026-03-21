@@ -1,33 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="#000000"
-    android:paddingLeft="20dp"
-    android:paddingRight="20dp"
-    android:paddingTop="14dp"
-    android:paddingBottom="14dp"
-    android:minHeight="72dp">
+    android:layout_height="72dp"
+    android:orientation="horizontal"
+    android:background="#000000">
 
+    <!-- Artwork thumbnail — dark grey placeholder while loading -->
+    <ImageView
+        android:id="@+id/img_album_art"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:scaleType="centerCrop"
+        android:background="#1A1A1A" />
+
+    <!-- Playlist name, vertically centred -->
     <TextView
         android:id="@+id/txt_album_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
-        android:textStyle="bold"
-        android:maxLines="1"
-        android:ellipsize="end" />
-
-    <TextView
-        android:id="@+id/txt_album_artist"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="#888888"
-        android:textSize="13sp"
-        android:layout_marginTop="3dp"
-        android:maxLines="1"
+        android:maxLines="2"
         android:ellipsize="end" />
 
 </LinearLayout>
