@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -34,18 +35,22 @@ public class MainActivity extends Activity {
     private static final int POLL_INTERVAL_MS = 2000;
 
     // Views
-    private TextView txtStatus;
-    private TextView txtTitle;
-    private TextView txtArtist;
-    private TextView txtAlbum;
-    private TextView txtVolume;
-    private Button   btnPlayPause;
+    private TextView  txtStatus;
+    private TextView  txtTitle;
+    private TextView  txtArtist;
+    private TextView  txtAlbum;
+    private TextView  txtVolume;
+    private Button    btnPlayPause;
+    private ImageView imgArtwork;
 
     // State
     private BluOSClient client;
-    private boolean isPlaying    = false;
+    private boolean isPlaying     = false;
+    private boolean isMuted       = false;
+    private boolean isStream      = false;  // true when totlen==0 (live radio)
     private int     currentVolume = 0;
-    private boolean polling      = false;
+    private boolean polling       = false;
+    private String  currentArtworkUrl = "";
 
     private final Handler handler = new Handler();
 
@@ -79,12 +84,13 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.activity_main);
 
-        txtStatus   = (TextView) findViewById(R.id.txt_status);
-        txtTitle    = (TextView) findViewById(R.id.txt_title);
-        txtArtist   = (TextView) findViewById(R.id.txt_artist);
-        txtAlbum    = (TextView) findViewById(R.id.txt_album);
-        txtVolume   = (TextView) findViewById(R.id.txt_volume);
-        btnPlayPause = (Button)  findViewById(R.id.btn_play_pause);
+        txtStatus    = (TextView)  findViewById(R.id.txt_status);
+        txtTitle     = (TextView)  findViewById(R.id.txt_title);
+        txtArtist    = (TextView)  findViewById(R.id.txt_artist);
+        txtAlbum     = (TextView)  findViewById(R.id.txt_album);
+        txtVolume    = (TextView)  findViewById(R.id.txt_volume);
+        btnPlayPause = (Button)    findViewById(R.id.btn_play_pause);
+        imgArtwork   = (ImageView) findViewById(R.id.img_artwork);
 
         setupButtons();
     }
@@ -132,7 +138,10 @@ public class MainActivity extends Activity {
 
     private void setupButtons() {
         btnPlayPause.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) { togglePlayPause(); }
+            @Override public void onClick(View v) {
+                if (isStream) toggleMute();
+                else          togglePlayPause();
+            }
         });
 
         findViewById(R.id.btn_prev).setOnClickListener(new View.OnClickListener() {
@@ -207,6 +216,28 @@ public class MainActivity extends Activity {
     // -------------------------------------------------------------------------
     // Commands
     // -------------------------------------------------------------------------
+
+    private void toggleMute() {
+        if (client == null) return;
+        final boolean wasMuted = isMuted;
+        isMuted = !isMuted;
+        updatePlayPauseButton();
+        new Thread(new Runnable() {
+            @Override public void run() {
+                try {
+                    if (wasMuted) client.unmute();
+                    else          client.mute();
+                } catch (final Exception e) {
+                    handler.post(new Runnable() {
+                        @Override public void run() {
+                            isMuted = wasMuted;
+                            updatePlayPauseButton();
+                        }
+                    });
+                }
+            }
+        }).start();
+    }
 
     private void togglePlayPause() {
         if (client == null) return;
@@ -322,6 +353,8 @@ public class MainActivity extends Activity {
 
     private void updateUI(BluOSStatus status) {
         isPlaying     = status.isPlaying;
+        isMuted       = status.mute;
+        isStream      = (status.totlen == 0);
         currentVolume = status.volume;
 
         txtTitle.setText(status.title.length() > 0 ? status.title : "Nothing playing");
@@ -330,11 +363,21 @@ public class MainActivity extends Activity {
         txtVolume.setText(String.valueOf(status.volume));
         txtStatus.setText(stateLabel(status.state));
 
+        // Load artwork only when the URL changes — avoids redundant fetches every 2s
+        if (status.imageUrl != null && !status.imageUrl.equals(currentArtworkUrl)) {
+            currentArtworkUrl = status.imageUrl;
+            ImageCache.load(status.imageUrl, imgArtwork, handler);
+        }
+
         updatePlayPauseButton();
     }
 
     private void updatePlayPauseButton() {
-        btnPlayPause.setText(isPlaying ? "||" : ">");
+        if (isStream) {
+            btnPlayPause.setText(isMuted ? "UNMUTE" : "MUTE");
+        } else {
+            btnPlayPause.setText(isPlaying ? "||" : ">");
+        }
     }
 
     private String stateLabel(String state) {

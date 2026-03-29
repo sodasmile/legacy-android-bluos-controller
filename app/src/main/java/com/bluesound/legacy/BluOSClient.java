@@ -54,6 +54,9 @@ public class BluOSClient {
         doGet("/Volume?level=" + clamped);
     }
 
+    public void mute()   throws IOException { doGet("/Volume?mute=1"); }
+    public void unmute() throws IOException { doGet("/Volume?mute=0"); }
+
     public void playAlbum(String service, String albumId) throws IOException {
         doGet("/Add?playnow=1&service=" + service + "&albumid=" + albumId);
     }
@@ -202,6 +205,19 @@ public class BluOSClient {
                         status.volume = Integer.parseInt(readText(parser).trim());
                     } catch (NumberFormatException e) {
                         status.volume = 0;
+                    }
+                } else if ("mute".equals(tag)) {
+                    status.mute = "1".equals(readText(parser).trim());
+                } else if ("totlen".equals(tag)) {
+                    try {
+                        status.totlen = Integer.parseInt(readText(parser).trim());
+                    } catch (NumberFormatException e) {
+                        status.totlen = 0;
+                    }
+                } else if ("image".equals(tag)) {
+                    String rel = readText(parser);
+                    if (rel != null && rel.length() > 0) {
+                        status.imageUrl = "http://" + host + ":" + port + rel;
                     }
                 }
             }

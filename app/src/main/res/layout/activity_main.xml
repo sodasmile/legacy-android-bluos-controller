@@ -34,86 +34,125 @@
         android:orientation="horizontal"
         android:clickable="true">
 
-        <!-- Left edge: swipe-left hint  "‹ RADIO" rotated to read bottom→top -->
-        <TextView
-            android:layout_width="28dp"
-            android:layout_height="match_parent"
-            android:text="&#8249; RADIO"
-            android:textColor="#2D2D2D"
-            android:textSize="11sp"
-            android:gravity="center"
-            android:rotation="-90" />
-
-        <!-- Centre: status + track info -->
+        <!-- Left hint column: chevron + label stacked, no rotation needed -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="44dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:orientation="vertical"
-            android:gravity="center"
-            android:padding="8dp">
-
-            <!-- Small state label (Playing / Paused / Cannot reach player …) -->
+            android:gravity="center">
             <TextView
-                android:id="@+id/txt_status"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Connecting..."
-                android:textColor="#888888"
-                android:textSize="12sp"
+                android:text="&#8249;"
+                android:textColor="#303030"
+                android:textSize="28sp"
                 android:gravity="center" />
-
-            <!-- Track title -->
             <TextView
-                android:id="@+id/txt_title"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=""
-                android:textColor="#FFFFFF"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:layout_marginTop="10dp"
-                android:maxLines="2"
-                android:ellipsize="end" />
-
-            <!-- Artist -->
-            <TextView
-                android:id="@+id/txt_artist"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textColor="#CCCCCC"
-                android:textSize="16sp"
-                android:gravity="center"
-                android:layout_marginTop="6dp"
-                android:maxLines="1"
-                android:ellipsize="end" />
-
-            <!-- Album -->
-            <TextView
-                android:id="@+id/txt_album"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textColor="#777777"
-                android:textSize="13sp"
-                android:gravity="center"
-                android:layout_marginTop="3dp"
-                android:maxLines="1"
-                android:ellipsize="end" />
-
+                android:text="RADIO"
+                android:textColor="#282828"
+                android:textSize="9sp"
+                android:gravity="center" />
         </LinearLayout>
 
-        <!-- Right edge: swipe-right hint  "PLAYLISTS ›" rotated to read top→bottom -->
-        <TextView
-            android:layout_width="28dp"
+        <!-- Centre: album art background + dark scrim + track info text -->
+        <FrameLayout
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:text="PLAYLISTS &#8250;"
-            android:textColor="#2D2D2D"
-            android:textSize="11sp"
-            android:gravity="center"
-            android:rotation="90" />
+            android:layout_weight="1">
+
+            <!-- Album artwork — fills the frame, cropped to fit -->
+            <ImageView
+                android:id="@+id/img_artwork"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop" />
+
+            <!-- Dark scrim so text stays readable over any artwork -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#CC000000" />
+
+            <!-- Track info centred over the artwork -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/txt_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Connecting..."
+                    android:textColor="#888888"
+                    android:textSize="12sp"
+                    android:gravity="center" />
+
+                <TextView
+                    android:id="@+id/txt_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="#FFFFFF"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:maxLines="2"
+                    android:ellipsize="end" />
+
+                <TextView
+                    android:id="@+id/txt_artist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="#CCCCCC"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:layout_marginTop="6dp"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+                <TextView
+                    android:id="@+id/txt_album"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="#777777"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:layout_marginTop="3dp"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Right hint column: label + chevron stacked -->
+        <LinearLayout
+            android:layout_width="44dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LISTS"
+                android:textColor="#282828"
+                android:textSize="9sp"
+                android:gravity="center" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="&#8250;"
+                android:textColor="#303030"
+                android:textSize="28sp"
+                android:gravity="center" />
+        </LinearLayout>
 
     </LinearLayout>
 
