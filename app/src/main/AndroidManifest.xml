@@ -27,7 +27,7 @@
         -->
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="landscape"
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,15 +39,15 @@
 
         <activity
             android:name=".SettingsActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="landscape" />
 
         <activity
             android:name=".PresetActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="landscape" />
 
         <activity
             android:name=".AlbumActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="landscape" />
 
         <!-- Starts the app automatically on device boot -->
         <receiver
