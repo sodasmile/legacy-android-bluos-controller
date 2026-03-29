@@ -31,60 +31,89 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2.5"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:clickable="true"
-        android:padding="8dp">
+        android:orientation="horizontal"
+        android:clickable="true">
 
-        <!-- Small state label (Playing / Paused / Cannot reach player …) -->
+        <!-- Left edge: swipe-left hint  "‹ RADIO" rotated to read bottom→top -->
         <TextView
-            android:id="@+id/txt_status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Connecting..."
-            android:textColor="#888888"
-            android:textSize="12sp"
-            android:gravity="center" />
-
-        <!-- Track title -->
-        <TextView
-            android:id="@+id/txt_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textColor="#FFFFFF"
-            android:textSize="22sp"
-            android:textStyle="bold"
+            android:layout_width="28dp"
+            android:layout_height="match_parent"
+            android:text="&#8249; RADIO"
+            android:textColor="#2D2D2D"
+            android:textSize="11sp"
             android:gravity="center"
-            android:layout_marginTop="10dp"
-            android:maxLines="2"
-            android:ellipsize="end" />
+            android:rotation="-90" />
 
-        <!-- Artist -->
-        <TextView
-            android:id="@+id/txt_artist"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textColor="#CCCCCC"
-            android:textSize="16sp"
+        <!-- Centre: status + track info -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
             android:gravity="center"
-            android:layout_marginTop="6dp"
-            android:maxLines="1"
-            android:ellipsize="end" />
+            android:padding="8dp">
 
-        <!-- Album -->
+            <!-- Small state label (Playing / Paused / Cannot reach player …) -->
+            <TextView
+                android:id="@+id/txt_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Connecting..."
+                android:textColor="#888888"
+                android:textSize="12sp"
+                android:gravity="center" />
+
+            <!-- Track title -->
+            <TextView
+                android:id="@+id/txt_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginTop="10dp"
+                android:maxLines="2"
+                android:ellipsize="end" />
+
+            <!-- Artist -->
+            <TextView
+                android:id="@+id/txt_artist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="#CCCCCC"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:layout_marginTop="6dp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <!-- Album -->
+            <TextView
+                android:id="@+id/txt_album"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="#777777"
+                android:textSize="13sp"
+                android:gravity="center"
+                android:layout_marginTop="3dp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+        </LinearLayout>
+
+        <!-- Right edge: swipe-right hint  "PLAYLISTS ›" rotated to read top→bottom -->
         <TextView
-            android:id="@+id/txt_album"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textColor="#777777"
-            android:textSize="13sp"
+            android:layout_width="28dp"
+            android:layout_height="match_parent"
+            android:text="PLAYLISTS &#8250;"
+            android:textColor="#2D2D2D"
+            android:textSize="11sp"
             android:gravity="center"
-            android:layout_marginTop="3dp"
-            android:maxLines="1"
-            android:ellipsize="end" />
+            android:rotation="90" />
 
     </LinearLayout>
 

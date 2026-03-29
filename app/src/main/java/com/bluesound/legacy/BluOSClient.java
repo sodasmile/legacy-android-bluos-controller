@@ -169,6 +169,11 @@ public class BluOSClient {
     private BluOSStatus parseStatus(String xml) throws IOException, XmlPullParserException {
         BluOSStatus status = new BluOSStatus();
 
+        // title1/2/3 are populated for all service types and take precedence
+        // over name/artist/album. For radio, <name> is the raw stream URL;
+        // <title1> is the station name, <title2> the current programme/song.
+        String title1 = "", title2 = "", title3 = "";
+
         XmlPullParser parser = Xml.newPullParser();
         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
         parser.setInput(new StringReader(xml));
@@ -180,6 +185,12 @@ public class BluOSClient {
                 if ("state".equals(tag)) {
                     status.state = readText(parser);
                     status.isPlaying = "play".equals(status.state);
+                } else if ("title1".equals(tag)) {
+                    title1 = readText(parser);
+                } else if ("title2".equals(tag)) {
+                    title2 = readText(parser);
+                } else if ("title3".equals(tag)) {
+                    title3 = readText(parser);
                 } else if ("name".equals(tag)) {
                     status.title = readText(parser);
                 } else if ("artist".equals(tag)) {
@@ -196,6 +207,12 @@ public class BluOSClient {
             }
             event = parser.next();
         }
+
+        // Prefer title1/2/3 — they are display-friendly for every service type
+        if (title1.length() > 0) status.title  = title1;
+        if (title2.length() > 0) status.artist = title2;
+        if (title3.length() > 0) status.album  = title3;
+
         return status;
     }
 
